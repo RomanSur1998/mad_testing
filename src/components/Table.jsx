@@ -1,53 +1,19 @@
 import React, { useEffect } from "react";
 import styles from "../style/Table.module.css";
-import { reportData1, reportData2, reportData3 } from "../consts/Tabledata";
 import { useDispatch, useSelector } from "react-redux";
-import { getDataArrayAction, getValueAction } from "../actions/Action";
+import { getValueAction } from "../actions/Action";
+// import { StyleHook } from "../hooks/Styleshook";
+import { useChangeValue } from "../hooks/ChangeValue";
+import { BodyTable } from "../function/BodyTable";
+import { HeaderTable } from "../function/HeaderTable";
 
 const Table = () => {
   const { data } = useSelector((state) => state);
   console.log(data);
+  const { header } = data.data;
 
   const dispatch = useDispatch();
-
-  function handleChangeArray(selectedValue) {
-    switch (selectedValue) {
-      case "Data Array 1":
-        dispatch(getDataArrayAction(reportData1));
-        break;
-      case "Data Array 2":
-        dispatch(getDataArrayAction(reportData2));
-        break;
-      case "Data Array 3":
-        dispatch(getDataArrayAction(reportData3));
-        break;
-      default:
-        break;
-    }
-  }
-
-  useEffect(() => {
-    handleChangeArray(data.value);
-  }, [data.value]);
-
-  function setStyleAlign(columnType, align) {
-    if (align) {
-      return align;
-    } else {
-      switch (columnType) {
-        case "string":
-          return "left";
-        case "integer":
-          return "right";
-        case "float":
-          return "right";
-        case "boolean":
-          return "center";
-        default:
-          return "left";
-      }
-    }
-  }
+  useChangeValue();
 
   return (
     <>
@@ -64,40 +30,8 @@ const Table = () => {
             </select>
           </div>
           <table>
-            <thead>
-              <tr>
-                {data.data.header.map((item) => (
-                  <th key={item.id} style={{ textAlign: item.align }}>
-                    {item.caption}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {data.data.data.map((item, index) => (
-                <tr key={index}>
-                  {item.map((elem, index) => (
-                    <td
-                      key={index}
-                      style={{
-                        textAlign: setStyleAlign(
-                          data.data.header[index].type,
-                          data.data.header[index].align
-                        ),
-                      }}
-                    >
-                      {typeof elem === "object"
-                        ? elem.d
-                        : typeof elem === "boolean"
-                        ? elem === true
-                          ? "Active"
-                          : "Unactive"
-                        : elem}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
+            <thead>{HeaderTable(header)}</thead>
+            {BodyTable(data)}
           </table>
         </div>
       </div>
